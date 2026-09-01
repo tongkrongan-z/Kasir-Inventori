@@ -6153,7 +6153,6 @@ function syncDataInBackground(kasirName) {
         else updateMobileCartBar();
       });
       window.addEventListener('beforeunload', function(e) { if (posCart.length > 0) { const confirmationMessage = 'Keranjang kasir masih berisi barang. Yakin ingin meninggalkan halaman?'; e.returnValue = confirmationMessage; return confirmationMessage; } });
-      setTimeout(function() { if (!document.fullscreenElement && !document.webkitFullscreenElement) { showToast('', 'success'); } }, 2000);
       if (navigator.bluetooth) { const btnReceipt = DOM.btnPrintBT; const btnShift = DOM.btnPrintBTShift; if(btnReceipt) btnReceipt.style.display = 'inline-flex'; if(btnShift) btnShift.style.display = 'inline-flex'; }
     }
     
