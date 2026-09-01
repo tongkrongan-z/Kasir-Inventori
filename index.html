@@ -5,13 +5,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Inventori & POS System</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon.png">
   <script>
     // URL alamat Web App Apps Script yang menjadi backend.
     window.APP_CONFIG = Object.assign({
-      apiUrl: 'https://script.google.com/macros/s/AKfycbwwezqJruV8EYNNGUlyBjOaHXXzfTIVsq6gmNAE16RjHqV0lEINmLF-tEDAFahBlg4L/exec',
-      githubBaseUrl: 'https://tongkrongan-z.github.io/Kasir-Inventori/'
+      apiUrl: '',
+      githubBaseUrl: ''
     }, window.APP_CONFIG || {});
   </script>
   <meta name="theme-color" content="#A4CF2A">
@@ -298,9 +296,10 @@
       body.dark-mode, body.dark-mode p, body.dark-mode span, body.dark-mode div, body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4, body.dark-mode h5, body.dark-mode h6, body.dark-mode .card, body.dark-mode .modal-content, body.dark-mode .report-card, body.dark-mode .receipt, body.dark-mode .data-table td, body.dark-mode .report-table td, body.dark-mode .matrix-table td { color: #000000 !important; }
       .modal-content, .card, .report-card, .receipt { box-shadow: none !important; border-color: #ddd !important; }
       .badge { color: #fff !important; }
-      body.printing-label * { visibility: hidden; }
+      body.printing-label > *:not(#printLabelArea) { display: none !important; }
       body.printing-label #printLabelArea, body.printing-label #printLabelArea * { visibility: visible; background: #fff !important; color: #000 !important; }
       body.printing-label #printLabelArea { display: block !important; position: absolute; left: 0; top: 0; width: 100%; padding: 0; margin: 0; }
+      body.printing-label .loading-bar { display: none !important; }
       body.printing-label .label-item, body.printing-label .label-box { border: none; padding: 1mm 0; margin: 0; }
       body.printing-label .label-grid { padding: 5mm; grid-template-columns: repeat(3, 1fr); gap: 5mm; }
       body.printing-receipt * { visibility: hidden; }
@@ -1679,19 +1678,19 @@ body.dark-mode .nav-logo span { color:#A4CF2A !important; }
           <span class="mobile-cart-bar-caret">▲</span>
         </button>
         <div class="card pos-cart-panel" id="posCartPanel">
-          <div class="pos-cart-header" role="button" tabindex="0" onclick="toggleMobileCart()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleMobileCart();}">
+          <div class="pos-cart-header" role="button" tabindex="0" onclick="if(!event.target.closest('button')) toggleMobileCart()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();if(!event.target.closest('button')) toggleMobileCart();}">
             <div style="display: flex; align-items: center; gap: 10px;">
-                 <button type="button" class="btn-action pos-cart-close-btn" onclick="event.stopPropagation(); toggleMobileCart(false);" title="Tutup Keranjang" style="background: var(--ui-danger-bg); color: var(--ui-danger); border: 1px solid var(--ui-danger-border); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                 <button type="button" class="btn-action pos-cart-close-btn" onclick="toggleMobileCart(false);" title="Tutup Keranjang" style="background: var(--ui-danger-bg); color: var(--ui-danger); border: 1px solid var(--ui-danger-border); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
                   <h3 style="margin:0;">Keranjang <span id="edit-mode-indicator" style="display:none; font-size:12px; color: var(--color-danger);">(Mode Edit)</span></h3>
                 </div>
             <div style="display: flex; gap: 8px; align-items: center;">
-                <button type="button" class="btn-action" id="cancelEditBtn" onclick="event.stopPropagation(); cancelEditPOS();" title="Batal Edit" style="display:none; font-size: 12px; padding: 4px 8px; border: 1px solid var(--color-border); color: var(--color-danger);">
+                <button type="button" class="btn-action" id="cancelEditBtn" onclick="cancelEditPOS();" title="Batal Edit" style="display:none; font-size: 12px; padding: 4px 8px; border: 1px solid var(--color-border); color: var(--color-danger);">
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                   Batal
                 </button>
-                <button type="button" class="btn-action btn-del" id="clearCartBtn" onclick="event.stopPropagation(); clearCart();" title="Kosongkan Keranjang" style="font-size: 12px; padding: 4px  8px; border: 1px solid var(--color-border);">
+                <button type="button" class="btn-action btn-del" id="clearCartBtn" onclick="clearCart();" title="Kosongkan Keranjang" style="font-size: 12px; padding: 4px 8px; border: 1px solid var(--color-border);">
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                   Kosongkan
                 </button>
@@ -4247,7 +4246,7 @@ function refreshLogs() {
         const p = state.products.find(x => x.ID === id);
         if (p) {
           document.getElementById('paket-ID').value = p.ID; document.getElementById('paket-NAMA').value = p.NAMA; document.getElementById('paket-KATEGORI').value = p.KATEGORI; document.getElementById('paket-HARGA_POS').value = Number(p.HARGA_POS || 0).toLocaleString('id-ID');
-          if (state.bundleMap && state.bundleMap[p.ID]) { paketCart = state.bundleMap[p.ID].map(b => ({ ID_BARANG: b.ID_BAHAN, NAMA_BARANG: b.NAMA_BAHAN, JUMLAH: b.JUMLAH })); renderPaketCart(); }
+          if (state.bundleMap && state.bundleMap[p.ID]) { paketCart = state.bundleMap[p.ID].map(b => { const bp = state.products.find(x => x.ID === b.ID_BAHAN); return { ID_BARANG: b.ID_BAHAN, NAMA_BARANG: b.NAMA_BAHAN, JUMLAH: b.JUMLAH, SATUAN: bp ? (bp.SATUAN || 'PCS') : 'PCS' }; }); renderPaketCart(); }
         }
       }
       openModal('modal-paket');
@@ -4259,14 +4258,14 @@ function refreshLogs() {
       const prod = state.products.find(p => p.NAMA.toLowerCase() === name.toLowerCase());
       if (!prod) return showToast('Bahan tidak ditemukan', 'error');
       const existing = paketCart.find(i => i.ID_BARANG === prod.ID);
-      if (existing) { existing.JUMLAH += qty; } else { paketCart.push({ ID_BARANG: prod.ID, NAMA_BARANG: prod.NAMA, JUMLAH: qty }); }
+      if (existing) { existing.JUMLAH += qty; existing.SATUAN = prod.SATUAN || 'PCS'; } else { paketCart.push({ ID_BARANG: prod.ID, NAMA_BARANG: prod.NAMA, JUMLAH: qty, SATUAN: prod.SATUAN || 'PCS' }); }
       document.getElementById('paket-item-name').value = ''; document.getElementById('paket-item-qty').value = ''; renderPaketCart();
     }
     function removePaketItem(id) { paketCart = paketCart.filter(i => i.ID_BARANG !== id); renderPaketCart(); }
     function renderPaketCart() {
       let html = '';
       if (paketCart.length === 0) { html = '<p style="text-align:center; color:var(--color-text-muted); padding: 10px 0;">Belum ada bahan</p>'; } 
-      else { paketCart.forEach(i => { html += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--color-border);"><div><strong>${escapeHtml(i.NAMA_BARANG)}</strong><br><small>${i.JUMLAH} Porsi</small></div><button onclick="removePaketItem('${i.ID_BARANG}')" class="btn-action btn-del" style="padding:0;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>`; }); }
+      else { paketCart.forEach(i => { html += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--color-border);"><div><strong>${escapeHtml(i.NAMA_BARANG)}</strong><br><small>${formatQty(i.JUMLAH)} ${escapeHtml(i.SATUAN || 'PCS')}</small></div><button onclick="removePaketItem('${i.ID_BARANG}')" class="btn-action btn-del" style="padding:0;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>`; }); }
       document.getElementById('paket-cart-list').innerHTML = html;
     }
     function savePaket(btn) {
@@ -4331,7 +4330,7 @@ function refreshLogs() {
       const p = state.products.find(x => x.ID === id); if (!p) return; const kode = p.KODE || p.ID; const price = formatRupiah(p.HARGA_POS);
       const printArea = DOM.printLabelArea;
       printArea.style.display = 'block';
-      printArea.innerHTML = '<div class="label-item"><div class="label-name">' + escapeHtml(p.NAMA) + '</div><svg id="barcode-canvas-single"></svg><div class="label-price">' + price + '</div><div class="label-code">' + kode + '</div></div>';
+      printArea.innerHTML = '<div class="label-item"><div class="label-name">' + escapeHtml(p.NAMA) + '</div><svg id="barcode-canvas-single"></svg><div class="label-price">' + price + '</div><div class="label-code">' + escapeHtml(kode) + '</div></div>';
       setTimeout(function() {
         try { JsBarcode("#barcode-canvas-single", kode, { format: "CODE128", displayValue: true, fontSize: 14, textMargin: 2, height: 50, margin: 4, width: 2 }); } catch(e) { console.error("JsBarcode error:", e); }
         setTimeout(function() {
@@ -4347,15 +4346,16 @@ function refreshLogs() {
     }
 
     function printAllBarcodes() {
-      if (state.products.length === 0) return showToast("Tidak ada produk", "error");
+      const printableProducts = state.products.filter(p => p.STATUS === 'AKTIF' && (p.KODE || p.ID));
+      if (printableProducts.length === 0) return showToast("Tidak ada produk aktif untuk dicetak", "error");
       let html = '<div class="label-grid">';
-      state.products.forEach(function(p, index) { const kode = p.KODE || p.ID; const price = formatRupiah(p.HARGA_POS); html += '<div class="label-box"><div class="label-name">' + p.NAMA + '</div><svg id="bc-' + index + '"></svg><div class="label-price">' + price + '</div><div class="label-code">' + kode + '</div></div>'; });
+      printableProducts.forEach(function(p, index) { const kode = p.KODE || p.ID; const price = formatRupiah(p.HARGA_POS); html += '<div class="label-box"><div class="label-name">' + escapeHtml(p.NAMA) + '</div><svg id="bc-' + index + '"></svg><div class="label-price">' + price + '</div><div class="label-code">' + escapeHtml(kode) + '</div></div>'; });
       html += '</div>';
       const printArea = DOM.printLabelArea; 
       printArea.style.display = 'block';
       printArea.innerHTML = html;
       setTimeout(function() {
-        state.products.forEach(function(p, index) { const kode = p.KODE || p.ID; try { JsBarcode('#bc-' + index, kode, { format: "CODE128", displayValue: true, fontSize: 10, textMargin: 1, height: 40, margin: 2, width: 1.5 }); } catch(e) { console.error("JsBarcode error:", e); } });
+        printableProducts.forEach(function(p, index) { const kode = p.KODE || p.ID; try { JsBarcode('#bc-' + index, kode, { format: "CODE128", displayValue: true, fontSize: 10, textMargin: 1, height: 40, margin: 2, width: 1.5 }); } catch(e) { console.error("JsBarcode error:", e); } });
         setTimeout(function() {
           document.body.classList.add('printing-label'); 
           window.print();
@@ -4836,7 +4836,8 @@ function refreshLogs() {
         if (qrCodeMessage.startsWith('INV-KSR-')) {
           stopBarcodeScanner(); playBeep(); showToast('Memanggil transaksi: ' + qrCodeMessage); callReceiptByCode(qrCodeMessage); return;
         }
-        const p = state.products.find(b => b.KODE === qrCodeMessage || b.ID === qrCodeMessage);
+        const lowerMsg = qrCodeMessage.toLowerCase().trim();
+        const p = state.products.find(b => String(b.KODE || '').toLowerCase() === lowerMsg || String(b.ID || '').toLowerCase() === lowerMsg);
         if (p) {
           addToCart(p.ID); playBeep(); showToast(p.NAMA + ' ditambahkan ke keranjang'); stopBarcodeScanner();
         } else {
@@ -4909,7 +4910,7 @@ function refreshLogs() {
       });
       
       const posProducts = state.products.filter(function(p) { return p.AKTIF_POS === 'YA' && p.STATUS === 'AKTIF' && Number(p.HARGA_POS) > 0 && (currentPosCategory === '' || p.KATEGORI === currentPosCategory); });
-      const filtered = posProducts.filter(function(p) { return p.NAMA.toLowerCase().includes(searchVal); });
+      const filtered = posProducts.filter(function(p) { return p.NAMA.toLowerCase().includes(searchVal) || String(p.KODE || '').toLowerCase().includes(searchVal) || String(p.ID || '').toLowerCase().includes(searchVal); });
 
       const salesCount = state.salesMap || {};
       const topBadgeIds = state.topBadgeIds || [];
@@ -4940,7 +4941,8 @@ function refreshLogs() {
     function handlePOSSearch(e, val) {
       if (e.key === 'Enter') {
         if (val.startsWith('INV-KSR-')) { e.target.value = ''; renderPOSProducts(); callReceiptByCode(val); return; }
-        const p = state.products.find(b => b.KODE === val || b.ID === val);
+        const lowerVal = val.toLowerCase().trim();
+        const p = state.products.find(b => String(b.KODE || '').toLowerCase() === lowerVal || String(b.ID || '').toLowerCase() === lowerVal || String(b.KODE || '').toLowerCase().includes(lowerVal));
         if (p) { addToCart(p.ID); showToast(p.NAMA + ' ditambahkan ke keranjang'); e.target.value = ''; renderPOSProducts(); } 
         else { showToast('Barcode tidak ditemukan: ' + val, 'error'); }
       }
@@ -6151,7 +6153,7 @@ function syncDataInBackground(kasirName) {
         else updateMobileCartBar();
       });
       window.addEventListener('beforeunload', function(e) { if (posCart.length > 0) { const confirmationMessage = 'Keranjang kasir masih berisi barang. Yakin ingin meninggalkan halaman?'; e.returnValue = confirmationMessage; return confirmationMessage; } });
-      setTimeout(function() { if (!document.fullscreenElement && !document.webkitFullscreenElement) { showToast('Klik tombol layar penuh di kanan atas untuk tampilan maksimal', 'success'); } }, 2000);
+      setTimeout(function() { if (!document.fullscreenElement && !document.webkitFullscreenElement) { showToast('', 'success'); } }, 2000);
       if (navigator.bluetooth) { const btnReceipt = DOM.btnPrintBT; const btnShift = DOM.btnPrintBTShift; if(btnReceipt) btnReceipt.style.display = 'inline-flex'; if(btnShift) btnShift.style.display = 'inline-flex'; }
     }
     
